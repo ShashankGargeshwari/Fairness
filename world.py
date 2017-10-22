@@ -13,21 +13,27 @@ class world:
     entities = 0
 
 class cell(entity):
+
+    #Holds the sprite that has to be displayed
+    sprite = 0    
     
     # Holds an entity that is currently occupying the cell. If no entity, it holds the string nothing
     
     # Constructor to set state of a cell
     def __init__(self , x , y  ,p):
-       # super( x , y , p)   
+       # super( x , y , p)  
         super(cell ,self).__init__(x,y,p)
         self.entities = []
-        print("Count" , len(self.entities))
+        # print("Count" , len(self.entities))
       
-        
+    @classmethod
+    def setSprite(cls,img):
+        cls.sprite = img
+    
     # Method to insert an entity into the given cell
     def insert(self,s):
         self.entities.append(s)
-        print("Inserted Food into cell")
+        # print("Inserted Food into cell")
         return self
     
     def remove(self,a):
@@ -35,8 +41,8 @@ class cell(entity):
             print("Something is there")
         
     def display(self,win):
-        b = Rectangle(Point(self.x*self.pixelsPerUnit,self.y*self.pixelsPerUnit) , Point(self.x*self.pixelsPerUnit + self.pixelsPerUnit,self.y*self.pixelsPerUnit + self.pixelsPerUnit) )
-        b.draw(win)      
+        #win.blit(self.sprite , (self.x , self.y))   
+        super(cell,self).display(win)
         if len(self.entities) != 0:
            for e in self.entities:
                e.display(win)
@@ -70,9 +76,8 @@ class food(entity):
         super(food,self).__init__(x,y,p)
         
     def display(self,win):
+        super(food,self).display(win)
         
-        c = Circle(Point(self.x * self.pixelsPerUnit + self.pixelsPerUnit / 2, self.y * self.pixelsPerUnit + self.pixelsPerUnit / 2 ) , self.pixelsPerUnit/4)        
-        c.draw(win)
     
     
     

@@ -16,21 +16,28 @@ import graphics as gr
 class entity(object):
     
     pixelsPerUnit = 1
+    sprite = ''
     
     # Initialize each entity with x y co-ordinates and pixel density
     def __init__(self,x,y,p):
         self.x = x
         self.y = y
         self.setPPU(p)
-    
+            
     # Method to set Pixels per unit of all class instances that inherit from entity
     @classmethod
     def setPPU(cls,p):
         cls.pixelsPerUnit = p
+
+    # Method to set sprite for all class instances
+    @classmethod
+    def setSprite(cls,img):
+        cls.sprite = img
+        
     # Display the entity onto the Graphic Window passed to it
     def display(self , win):
-        c = Circle(point(x,y) , 0)
-        c.display(win)
+        if self.sprite != '':
+            win.blit(self.sprite,(self.x*self.pixelsPerUnit,self.y*self.pixelsPerUnit)) # Blip the sprite to the screen
         
     # Abstract method to update each entity after each framed  
     def update(self):
