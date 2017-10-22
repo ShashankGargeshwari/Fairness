@@ -17,9 +17,10 @@ import world
 from world import cell
 from world import food
 import random
+import pygame
 
 # Class that holds the game and player states
-class game(object):
+class gamemanager(object):
        
     # Contains the generative logic to produce a grid of cells | logic can be changed later
     def __init__(self , window, xSize, ySize , pSize):
@@ -56,11 +57,4 @@ class game(object):
 
    
 def main():
-    win = GraphWin("Game" , 300 , 200)
-    g = game(win,30,20,10)
-    g.display()
-    win.getMouse()
-    win.close()
-            
-if __name__ == '__main__':       
-     main()       
+   print("Running Main function in gamemanager")   

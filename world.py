@@ -71,7 +71,7 @@ class food(entity):
         
     def display(self,win):
         
-        c = Circle(Point(self.x * self.pixelsPerUnit + self.pixelsPerUnit / 2, self.y * self.pixelsPerUnit + self.pixelsPerUnit / 2 ) , self.pixelsPerUnit/2.0)        
+        c = Circle(Point(self.x * self.pixelsPerUnit + self.pixelsPerUnit / 2, self.y * self.pixelsPerUnit + self.pixelsPerUnit / 2 ) , self.pixelsPerUnit/4)        
         c.draw(win)
     
     
