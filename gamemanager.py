@@ -15,33 +15,34 @@ from graphics import *
 from numpy import ndarray
 import world
 from world import cell
+from world import food
 import random
 
 # Class that holds the game and player states
-class game:
+class game(object):
        
     # Contains the generative logic to produce a grid of cells | logic can be changed later
     def __init__(self , window, xSize, ySize , pSize):
         self.win = window        
         self.grid = np.arange(xSize*ySize , dtype=object).reshape(xSize,ySize)
-        self.players = np.arange(pSize).reshape(pSize)
         print(xSize,ySize)
         for i in range(xSize):
             for j in range(ySize):
                 r = random.randrange(0,50)
-                self.grid[i][j] = cell().insert(r)
-                print(r)
-        print("--------------------------------------")
+                self.grid[i][j] = cell(i , j , pSize)
+                if random.randrange(20) < 5:
+                    self.grid[i][j].insert(food(i,j,pSize))
+        print("Initialization Done...")
                 
       
     # render the game to the graphical window 
     def display(self):
-        for i in range(self.grid.shape[0]):
+       for i in range(self.grid.shape[0]):
             for j in range(self.grid.shape[1]):
-                c = Circle(Point( i * 10 , j * 10) , self.grid[i][j].entity)
-                c.draw(self.win)
-                print(self.grid[i][j].entity)
-                        
+                self.grid[i][j].display(self.win)
+                
+                
+        
     
     class environment:
         pass
@@ -52,33 +53,11 @@ class game:
             pass
         
     
-class player:
-    state = 0 #Maintains the current state of the player
-    x = 0
-    y = 0
-    #class that mentions player stats and such. These might later be summarized into the "state" of the player
-    class stats:
-        health = 100
-        happiness = 100
-        energy = 100
-        kindness = 100
-        
-        #constructor to set stats of the player
-        def __init__(this, he, ha, en, ki):
-            health = he
-            happiness = ha
-            energy = en
-            kindness = ki
-            
-        
-            
-    # Function to evaluate current state of the player, it's neighbours, then take a corresponding action based on these details
-    def nextAction():
-       pass
+
    
 def main():
     win = GraphWin("Game" , 300 , 200)
-    g = game(win,3,2,10)
+    g = game(win,30,20,10)
     g.display()
     win.getMouse()
     win.close()
