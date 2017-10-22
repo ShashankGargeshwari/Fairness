@@ -1,5 +1,5 @@
 #import all pre-requisites
-
+import gambit
 from gambit import *
 from gambit import nash
 from graphics import *
