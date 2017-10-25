@@ -13,6 +13,7 @@ What are the important attributes of such an entity?
 
 import graphics as gr
 
+# A basic 2D Entity that has a 2D co-ordinate and a sprite
 class entity(object):
     
     pixelsPerUnit = 1
@@ -39,6 +40,6 @@ class entity(object):
         if self.sprite != '':
             win.blit(self.sprite,(self.x*self.pixelsPerUnit,self.y*self.pixelsPerUnit)) # Blip the sprite to the screen
         
-    # Abstract method to update each entity after each framed  
+    # Abstract method to update and entity for a given frame  
     def update(self):
         pass

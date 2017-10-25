@@ -26,10 +26,7 @@ class cell(entity):
         self.entities = []
         # print("Count" , len(self.entities))
       
-    @classmethod
-    def setSprite(cls,img):
-        cls.sprite = img
-    
+      
     # Method to insert an entity into the given cell
     def insert(self,s):
         self.entities.append(s)
@@ -41,34 +38,37 @@ class cell(entity):
             print("Something is there")
         
     def display(self,win):
-        #win.blit(self.sprite , (self.x , self.y))   
+        print("Displaying Cell at " , self.x , self.y)
         super(cell,self).display(win)
         if len(self.entities) != 0:
            for e in self.entities:
+               print("Displaying entity at " , self.x , self.y , e)
                e.display(win)
+               
+               
        
 class player(entity):
     state = 0 #Maintains the current state of the player
    
-   #class that mentions player stats and such. These might later be summarized into the "state" of the player
-    class stats:
-        health = 100
-        happiness = 100
-        energy = 100
-        kindness = 100
-        
-        #constructor to set stats of the player
-        def __init__(this, he, ha, en, ki):
-            health = he
-            happiness = ha
-            energy = en
-            kindness = ki
-            
-        
+                 
+    #constructor to set stats of the player
+    def __init__(self, x, y, p, he, ha, en, ki):
+        super(player,self).__init__(x,y,p)
+        self.health = he
+        self.happiness = ha
+        self.energy = en
+        self.kindness = ki
+       
+                     
+        # Display the player in the world 
+    def display(self,win):
+        print("Displaying Player")
+        super(player,self).display(win)
+           
             
     # Function to evaluate current state of the player, it's neighbours, then take a corresponding action based on these details
     def nextAction():
-       pass
+        pass
 
 class food(entity):
     
@@ -76,7 +76,9 @@ class food(entity):
         super(food,self).__init__(x,y,p)
         
     def display(self,win):
+        print("Displaying Food")
         super(food,self).display(win)
+        
         
     
     

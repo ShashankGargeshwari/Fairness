@@ -16,33 +16,55 @@ from numpy import ndarray
 import world
 from world import cell
 from world import food
+from world import player
 import random
 import pygame
 
-# Class that holds the game and player states
+# Class that manages the game setup and update
 class gamemanager(object):
-     
+    
+    # Contains parameters used in the generation and simulation of the world 
     cellToPlayerRatio = 0.1
     foodSpawnChance = 0.2
+    
+    # Holds a list of all entities that have to be displayed
+    allEntities = '' 
      
-    # Contains the generative logic to produce a grid of cells | logic can be changed later
+    # Contains the generative logic to set up the world with food, players and other objects that might be needed to start the simulation
     def __init__(self , window, xSize, ySize , ppu):
         self.win = window        
+        xSize = xSize / ppu
+        ySize = ySize / ppu
+        # Create the matrix for the grid of cells
         self.grid = np.arange(xSize*ySize , dtype=object).reshape(xSize,ySize)
-        self.players = np.arange(xSize*ySize*self.cellToPlayerRatio , dtype = object).reshape(xSize*ySize*self.cellToPlayerRatio)
-        print(xSize,ySize)
+        
+        # Create the list for the players playing the game
+        self.players = np.arange(0 , dtype = object).reshape(0)
+        
+        
+        pn = 0
+        fn = 0        
+        # Iterate through the matrix of cells and insert food or player in them
         for i in range(xSize):
             for j in range(ySize):
                 r = random.randrange(0,50)
                 self.grid[i][j] = cell(i , j , ppu)
                 if random.randrange(100) < self.foodSpawnChance*100:
                     self.grid[i][j].insert(food(i,j,ppu))
+                    print("Food Inserted" , i , j , fn)
+                    fn = fn+1
+                else:
+                    if random.randrange(100) < self.cellToPlayerRatio*100:
+                        p = player(i,j,ppu,100,100,100,50)
+                        self.players = np.append(self.players, [p])
+                        print("Player Inserted at " , i , j , len(self.players))
+                        self.grid[i][j].insert(p)
+                        
         print("Initialization Done...")
                 
       
     # render the game to the graphical window 
     def display(self):
-       print("Displaying frame")
        for i in range(self.grid.shape[0]):
             for j in range(self.grid.shape[1]):
                 self.grid[i][j].display(self.win)
