@@ -19,7 +19,7 @@ g.players[0].strategies[0].label = "Leave"
 g.players[1].strategies[1].label = "Kill"
 g.players[1].strategies[1].label = "Leave"
 
-#Assign strategies in the form g[strategy o p1 , strategy of p2][payoff for player #]
+#Assign strategies in the form g[strategy of p1 , strategy of p2][payoff for player #]
 g[0,0][0] = 8
 g[0,0][1] = 4
 g[0,1][0] = 2

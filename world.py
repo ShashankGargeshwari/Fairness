@@ -5,7 +5,9 @@ Contains classes related to the world the game is supposed to take place in
 @author: shashank
 """
 import numpy as np
-import gambit as gb
+import gambit as gm
+from gambit import *
+from gambit import nash
 from entity import entity
 import graphics as gr
 from graphics import *
@@ -75,14 +77,44 @@ class player(entity):
     def simulateGame(self,vision):
         # Vision is a 5x5 matrix of all the objects around the player
               
-        playerCount = 0
+        # Add the player right at the start to give it the coveted position number 1      
+        players = [vision[2][2].entities[0]]
+        playerCount = [9]
+        dimension = []
+        
         # Count the number of players to set up the game
         for i in range(5):
             for j in range(5):
-                if vision[i][j] == "Player":
-                    playerCounnt = playerCount + 1
-        print("Player at" , self.x , self.y , "has vision as" , vision)
-
+                if vision[i][j] != None and len(vision[i][j].entities) > 0 and isinstance( vision[i][j].entities[0] , player) and vision[i][j].entities[0] != self:
+                    playerCount.append(9)
+                    players.append(vision[i][j].entities[0])
+                                        
+                    
+                
+        # Start constructing the table
+        g = gambit.new_table(playerCount)
+        g.title = "Game for Player [" + str(self.x) + " , "+ str(self.y) + "] vs " + str(len(playerCount) - 1) + " Players."
+        print("Simulating" + g.title)
+        print("Co-ordinates of other entities will be displayed relative to self player from this point onwards.")        
+        
+        dimension = playerCount[:]
+        playerCount = len(playerCount)
+        
+        # Set strategy labels and indices for all players                
+        for p in players:
+            i = players.index(p)
+            
+            # Set strategy indices and labels
+            for c in range(9):
+                g.players[i].strategies[c].label = "Move <" + str(self.optionMovement[c][0]) + "," + str(self.optionMovement[c][1]) + ">" 
+                               
+            if(i == 0):
+                g.players[i].label = "Self player"
+                # Since the self player is already added at the coveted 0 index, leave it out
+                continue
+            g.players[i].label = "Player at [" + str(p.x-self.x) +  "," + str(p.y-self.y) + "]"
+            print("    " + g.players[i].label)
+            
 # Class that represents the food in the game world
 class food(entity):
     

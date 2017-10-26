@@ -9,9 +9,9 @@ This is the main class that sets up the game, simulates it, displays it graphica
 # Import all the prerequisites here
 
 import gambit as gm
-import graphics  as gr
+from gambit import *
+from gambit import nash
 import numpy as np
-from graphics import *
 from numpy import ndarray
 import world
 from world import cell
@@ -66,22 +66,13 @@ class gamemanager(object):
             t = ""
             for i in range(-2,3):
                 for j in range(-2,3):
-                    print("i , j" , i ,  j)
                     # Check whether the cell is within the bounds of the grid
                     if p.x + i > -1 and p.x + i < xSize and  p.y + j > -1 and p.y + j < ySize:
-                        # If within bounds, ping cell, figure out which entity occipies it, put it in the vision matrix
-                        e = self.grid[p.x+i][p.y+j].ping()
-                        
-                        if len(e) > 0:
-                            if e[0] is player:
-                                t = "p"
-                            elif e[0] is food:
-                                t = "f"
-                        else:
-                            t = "c"
+                        v[i+2][j+2] = self.grid[p.x+i][p.y+j] 
+                                                                           
                     else:
-                        t = "n"
-                    v[j+2][i+2] = t
+                        v[i+2][j+2] = None
+                    
                     
             p.simulateGame(v)
                 
