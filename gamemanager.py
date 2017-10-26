@@ -61,6 +61,29 @@ class gamemanager(object):
                         self.grid[i][j].insert(p)
                         
         print("Initialization Done...")
+        for p in self.players:
+            v = np.arange(25  , dtype=object).reshape(5,5)
+            t = ""
+            for i in range(-2,3):
+                for j in range(-2,3):
+                    print("i , j" , i ,  j)
+                    # Check whether the cell is within the bounds of the grid
+                    if p.x + i > -1 and p.x + i < xSize and  p.y + j > -1 and p.y + j < ySize:
+                        # If within bounds, ping cell, figure out which entity occipies it, put it in the vision matrix
+                        e = self.grid[p.x+i][p.y+j].ping()
+                        
+                        if len(e) > 0:
+                            if e[0] is player:
+                                t = "p"
+                            elif e[0] is food:
+                                t = "f"
+                        else:
+                            t = "c"
+                    else:
+                        t = "n"
+                    v[j+2][i+2] = t
+                    
+            p.simulateGame(v)
                 
       
     # render the game to the graphical window 
@@ -76,8 +99,8 @@ class gamemanager(object):
         pass
     
     def update(self):
-        for i in range(self.players.size):
-          #  self.players[i].update()
+        for p in self.players:
+            
             pass
         
     
