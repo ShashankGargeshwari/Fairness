@@ -58,7 +58,7 @@ class player(entity):
     
     # Defines the various 2D movements that the player can perform
     optionMovement = {  0:(-1,-1) , 1:(0,-1) , 2:(1,-1) ,
-                        3:(-1,0)  , 4:(0,0)  , 5:(1,-0) ,
+                        3:(-1,0)  , 4:(0,0)  , 5:(1,0) ,
                         6:(-1,1)  , 7:(0,1)  , 8:(1,1)   }
                         
     #constructor to set stats of the player
@@ -134,6 +134,7 @@ class player(entity):
         for k in list(it.product(*[range(9)]*playerCount)):
             futureSight = deepcopy( vision )
             futureSightPlayers = [None]
+            print("Current movement choice is",k)
             
             #Assign futureSight players
             futureSightPlayers[0] = futureSight[2][2].entities[0]
@@ -145,8 +146,8 @@ class player(entity):
                         
                         if c is not None and len(c.entities) > 0:
                             if isinstance( c.entities[0] , player):
-                                futureSightPlayers.append( c.entities[0] )    
-                
+                                futureSightPlayers.append( c.entities[0] )
+                                
             #print("Options being chosen by players",k)
             # Iterate through individual choices of each player and update their position assuming that choice is made
             
@@ -159,16 +160,17 @@ class player(entity):
                 futureSight[currentPlayer.x - self.x+2][currentPlayer.y - self.y+2].entities.remove(currentPlayer)
                 
                 # Calculate new x,y for player based on the choice it made in the current combination
-                newX = currentPlayer.x + self.optionMovement[i][0]
-                newY = currentPlayer.x + self.optionMovement[i][1]
-                
+                newX = currentPlayer.x - self.x + self.optionMovement[l][0] + 2
+                newY = currentPlayer.y - self.y + self.optionMovement[l][1] + 2
+                                
                 # If new location is still within the future vision, add it to the cell at the new location 
-                if newX > -1 and newX < 5 and newY > -1 and newY < 5:
-                    futureSight[newX+2][newY+2].insert(currentPlayer)
+                if newX > -1 and newX < 5 and newY > -1 and newY < 5 and futureSight[newX][newY] is not None:
+                    futureSight[newX][newY].insert(currentPlayer)
                 else:
                     currentPlayer.payoff = 0
-            
+                                
             # All movement made, evaluate the payoffs for each player and store it
+            
             for i in range(5):
                 for j in range(5):
                     if futureSight[i][j] is None:
@@ -185,12 +187,14 @@ class player(entity):
                             if len(playersInCell) > 1 :
                                 for pic in playersInCell:
                                     pic.payoff = -9999
+                                    print(futureSightPlayers.index(pic) , "Found Player, so payoff is -9999")
                             elif len(playersInCell) == 1:
                                 if len(foodInCell) > 0:
                                     playersInCell[0].payoff = 20
+                                    print(futureSightPlayers.index(playersInCell[0]),"Found food so payoff is 20")
                                 else:
                                     playersInCell[0].payoff = -10
-            
+                                    print(futureSightPlayers.index(playersInCell[0]),"Found nothing, so payoff is -10")    
             # Now this is the tough part. Construct the payoffs :\
             # g[0,0][0] = 8
             #   ^    ^   
@@ -219,7 +223,7 @@ class player(entity):
         
         #Getting to the actual solving part of gambit
         solver = gambit.nash.ExternalEnumMixedSolver()
-        print("Solved")
+        print(solver.solve(g))
         #print(solver.solve(g))
             
 # Class that represents the food in the game world
