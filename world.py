@@ -11,6 +11,8 @@ from gambit import nash
 from entity import entity
 import graphics as gr
 from graphics import *
+import itertools as it
+from copy import copy,deepcopy
 
 class world:
     entities = 0
@@ -71,16 +73,22 @@ class player(entity):
         # Display the player in the world 
     def display(self,win):
         super(player,self).display(win)
-           
-            
+    
+    # Prepare the game table for the players
+    def prepareGameTable(self,vision,g):
+        print("\n\n ---Trying to prepare game table for player at" , self.x, self.y)
+        print("Number of players in the game is" , len(g.players))
+    
+    
     # Function to evaluate current state of the player, it's neighbours, then take a corresponding action based on these details
     def simulateGame(self,vision):
         # Vision is a 5x5 matrix of all the objects around the player
-              
+        futureSight = deepcopy(vision)      
+        
         # Add the player right at the start to give it the coveted position number 1      
         players = [vision[2][2].entities[0]]
         playerCount = [9]
-        dimension = []
+        dimension = [8]
         
         # Count the number of players to set up the game
         for i in range(5):
@@ -88,16 +96,15 @@ class player(entity):
                 if vision[i][j] != None and len(vision[i][j].entities) > 0 and isinstance( vision[i][j].entities[0] , player) and vision[i][j].entities[0] != self:
                     playerCount.append(9)
                     players.append(vision[i][j].entities[0])
-                                        
+                    dimension.append(8)                    
                     
                 
         # Start constructing the table
         g = gambit.new_table(playerCount)
-        g.title = "Game for Player [" + str(self.x) + " , "+ str(self.y) + "] vs " + str(len(playerCount) - 1) + " Players."
+        g.title = "\n \nGame for Player [" + str(self.x) + " , "+ str(self.y) + "] vs " + str(len(playerCount) - 1) + " Players."
         print("Simulating" + g.title)
         print("Co-ordinates of other entities will be displayed relative to self player from this point onwards.")        
         
-        dimension = playerCount[:]
         playerCount = len(playerCount)
         
         # Set strategy labels and indices for all players                
@@ -106,7 +113,7 @@ class player(entity):
             
             # Set strategy indices and labels
             for c in range(9):
-                g.players[i].strategies[c].label = "Move <" + str(self.optionMovement[c][0]) + "," + str(self.optionMovement[c][1]) + ">" 
+                g.players[i].strategies[c].label = "Move [" + str(self.optionMovement[c][0]) + "," + str(self.optionMovement[c][1]) + "]" 
                                
             if(i == 0):
                 g.players[i].label = "Self player"
@@ -114,6 +121,106 @@ class player(entity):
                 continue
             g.players[i].label = "Player at [" + str(p.x-self.x) +  "," + str(p.y-self.y) + "]"
             print("    " + g.players[i].label)
+        
+        # Now this is the tough part. Construct the payoffs :\
+        # g[0,0][0] = 8
+        #   ^    ^   
+        #   |    which player's payoff it is
+        #   |
+        #   same dimensions as number of players
+        g[dimension][0] = 2
+                       
+        # The list generates all possible combinations of choices | k contains ONE combination of the choices of all players | l is one choice of each player
+        for k in list(it.product(*[range(9)]*playerCount)):
+            futureSight = deepcopy( vision )
+            futureSightPlayers = [None]
+            
+            #Assign futureSight players
+            futureSightPlayers[0] = futureSight[2][2].entities[0]
+            for i in range(5):
+                    for j in range(5):
+                        if i == 2 and j == 2:
+                            continue
+                        c = futureSight[i][j]
+                        
+                        if c is not None and len(c.entities) > 0:
+                            if isinstance( c.entities[0] , player):
+                                futureSightPlayers.append( c.entities[0] )    
+                
+            #print("Options being chosen by players",k)
+            # Iterate through individual choices of each player and update their position assuming that choice is made
+            
+            for i,l in enumerate(k):
+                currentPlayer = futureSightPlayers[i]
+                #print("l Value" , l , "i value" , i )
+                #print("\nCurrently running game for Opponent" , currentPlayer.x , currentPlayer.y , "and Self" , self.x , self.y )
+                    
+                                
+                futureSight[currentPlayer.x - self.x+2][currentPlayer.y - self.y+2].entities.remove(currentPlayer)
+                
+                # Calculate new x,y for player based on the choice it made in the current combination
+                newX = currentPlayer.x + self.optionMovement[i][0]
+                newY = currentPlayer.x + self.optionMovement[i][1]
+                
+                # If new location is still within the future vision, add it to the cell at the new location 
+                if newX > -1 and newX < 5 and newY > -1 and newY < 5:
+                    futureSight[newX+2][newY+2].insert(currentPlayer)
+                else:
+                    currentPlayer.payoff = 0
+            
+            # All movement made, evaluate the payoffs for each player and store it
+            for i in range(5):
+                for j in range(5):
+                    if futureSight[i][j] is None:
+                        continue
+                    if len(futureSight[i][j].entities) > 0:
+                        foodInCell = []
+                        playersInCell = []
+                        for e in futureSight[i][j].entities:
+                            if isinstance(e,player):
+                                playersInCell.append(e)
+                            elif isinstance(e,food):
+                                foodInCell.append(e)
+                        
+                            if len(playersInCell) > 1 :
+                                for pic in playersInCell:
+                                    pic.payoff = -9999
+                            elif len(playersInCell) == 1:
+                                if len(foodInCell) > 0:
+                                    playersInCell[0].payoff = 20
+                                else:
+                                    playersInCell[0].payoff = -10
+            
+            # Now this is the tough part. Construct the payoffs :\
+            # g[0,0][0] = 8
+            #   ^    ^   
+            #   |    which player's payoff it is
+            #   |
+            #   same dimensions as number of players                                                                            
+            for p in futureSightPlayers:
+                g[k][ futureSightPlayers.index(p)] = p.payoff                    
+            
+            # Game Table is (Hopefully) filled with all the necessary values     
+        
+        #  Time to actually solve the game
+        p = g.mixed_profile()
+
+        #Initially spreads out probabilities evenly across all actions
+        #print(list(p))
+        
+        #Get expected payoff using MixedProfile.payoff(player)
+        print("\n\nProbability mixed strategy payoff of Player Self at",self.x , self.y )
+        print(p.payoff(g.players[0]))
+                
+        #Get stand alone payoff value (whatever that means)
+        print("\nStandanlone payoff values")
+        for i in range(9):
+            print(p.strategy_value(g.players[0].strategies[1]))
+        
+        #Getting to the actual solving part of gambit
+        solver = gambit.nash.ExternalEnumMixedSolver()
+        print("Solved")
+        #print(solver.solve(g))
             
 # Class that represents the food in the game world
 class food(entity):

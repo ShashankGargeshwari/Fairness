@@ -58,6 +58,6 @@ while not stop:
         
     pygame.display.update()
     clock.tick(60)
-   
+    stop = True
         
-pygame.quit() #Quit pygame and python once out of the game loop
+#pygame.quit() #Quit pygame and python once out of the game loop
