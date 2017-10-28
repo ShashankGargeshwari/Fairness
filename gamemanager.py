@@ -54,19 +54,19 @@ class gamemanager(object):
                     print("Food Inserted" , i , j , fn)
                     fn = fn+1
                 else:
-                    ''' #This bit generates players according to player/cell density
+                    #This bit generates players according to player/cell density
                     if random.randrange(100) < self.cellToPlayerRatio*100:
                         p = player(i,j,ppu,100,100,100,50)
                         self.players = np.append(self.players, [p])
                         print("Player Inserted at " , i , j , len(self.players))
-                        self.grid[i][j].insert(p)'''
+                        self.grid[i][j].insert(p)
                         
-                        # Generate 3 and only 3 players per game
+                    '''# Generate 3 and only 3 players per game
                     if len(self.players) < 3 and random.randrange(100) < 20:
                             p = player(i,j,ppu,100,100,100,50)
                             self.players = np.append(self.players, [p])
                             print("Player Inserted at " , i , j , len(self.players))
-                            self.grid[i][j].insert(p)
+                            self.grid[i][j].insert(p)'''
                         
         print("Initialization Done...")
         for p in self.players:

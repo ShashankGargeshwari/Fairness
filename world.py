@@ -134,8 +134,7 @@ class player(entity):
         for k in list(it.product(*[range(9)]*playerCount)):
             futureSight = deepcopy( vision )
             futureSightPlayers = [None]
-            print("Current movement choice is",k)
-            
+                        
             #Assign futureSight players
             futureSightPlayers[0] = futureSight[2][2].entities[0]
             for i in range(5):
@@ -164,10 +163,13 @@ class player(entity):
                 newY = currentPlayer.y - self.y + self.optionMovement[l][1] + 2
                                 
                 # If new location is still within the future vision, add it to the cell at the new location 
-                if newX > -1 and newX < 5 and newY > -1 and newY < 5 and futureSight[newX][newY] is not None:
-                    futureSight[newX][newY].insert(currentPlayer)
+                if newX > -1 and newX < 5 and newY > -1 and newY < 5 : 
+                    if futureSight[newX][newY] is not None:
+                        futureSight[newX][newY].insert(currentPlayer)
+                    else:
+                        currentPlayer.payoff = -999999
                 else:
-                    currentPlayer.payoff = 0
+                    currentPlayer.payoff = -200
                                 
             # All movement made, evaluate the payoffs for each player and store it
             
@@ -187,14 +189,12 @@ class player(entity):
                             if len(playersInCell) > 1 :
                                 for pic in playersInCell:
                                     pic.payoff = -9999
-                                    print(futureSightPlayers.index(pic) , "Found Player, so payoff is -9999")
                             elif len(playersInCell) == 1:
                                 if len(foodInCell) > 0:
                                     playersInCell[0].payoff = 20
-                                    print(futureSightPlayers.index(playersInCell[0]),"Found food so payoff is 20")
                                 else:
                                     playersInCell[0].payoff = -10
-                                    print(futureSightPlayers.index(playersInCell[0]),"Found nothing, so payoff is -10")    
+                                        
             # Now this is the tough part. Construct the payoffs :\
             # g[0,0][0] = 8
             #   ^    ^   
@@ -208,21 +208,10 @@ class player(entity):
         
         #  Time to actually solve the game
         p = g.mixed_profile()
-
-        #Initially spreads out probabilities evenly across all actions
-        #print(list(p))
-        
-        #Get expected payoff using MixedProfile.payoff(player)
-        print("\n\nProbability mixed strategy payoff of Player Self at",self.x , self.y )
-        print(p.payoff(g.players[0]))
-                
-        #Get stand alone payoff value (whatever that means)
-        print("\nStandanlone payoff values")
-        for i in range(9):
-            print(p.strategy_value(g.players[0].strategies[1]))
         
         #Getting to the actual solving part of gambit
-        solver = gambit.nash.ExternalEnumMixedSolver()
+        print("Soving the game for " , len(g.players) , " Players")
+        solver = gambit.nash.ExternalLogitSolver()
         print(solver.solve(g))
         #print(solver.solve(g))
             
