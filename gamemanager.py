@@ -17,6 +17,7 @@ import world
 from world import cell
 from world import food
 from world import player
+from world import scent
 import random
 import pygame
 
@@ -31,7 +32,8 @@ class gamemanager(object):
     # Holds a list of all entities that have to be displayed
     allEntities = '' 
      
-    # Contains the generative logic to set up the world with food, players and other objects that might be needed to start the simulation
+    # Contains the generative logic to set up the world with food, players and other objects that might be needed to
+    # start the simulation
     def __init__(self , window, xSize, ySize , ppu):
         self.win = window        
         xSize = xSize / ppu
@@ -40,11 +42,10 @@ class gamemanager(object):
         self.xSize = xSize
         self.ySize = ySize
         # Create the matrix for the grid of cells
-        self.grid = np.arange(xSize*ySize , dtype=object).reshape(xSize,ySize)
+        self.grid = np.arange((xSize)*(ySize), dtype=object).reshape(xSize, ySize)
         
         # Create the list for the players playing the game
         self.players = np.arange(0 , dtype = object).reshape(0)
-        
         
         pn = 0
         fn = 0        
@@ -95,7 +96,7 @@ class gamemanager(object):
                         v[i+2][j+2] = None
                     
                     
-            p.simulateGame(v)   
+            p.simulate_game(v)
             
        for p in self.players:
            p.move(self.grid,self.players)
