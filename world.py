@@ -13,6 +13,7 @@ import graphics as gr
 from graphics import *
 import itertools as it
 from copy import copy,deepcopy
+import random
 
 class world:
     entities = 0
@@ -36,11 +37,14 @@ class cell(entity):
     def insert(self,s):
         self.entities.append(s)
         # print("Inserted Food into cell")
+        s.x = self.x
+        s.y = self.y
         return self
     
     def remove(self,a):
         if len(self.entities) != 0:
             print("Something is there")
+            self.entities.remove(a)
         
     def display(self,win):
         super(cell,self).display(win)
@@ -68,18 +72,42 @@ class player(entity):
         self.happiness = ha
         self.energy = en
         self.kindness = ki
-       
+        self.nextOption = None
                      
         # Display the player in the world 
     def display(self,win):
         super(player,self).display(win)
     
+    def eat(self,f):
+        self.health = self.health + 10
+        if self.health > 100:
+            self.health = 100
     # Prepare the game table for the players
-    def prepareGameTable(self,vision,g):
-        print("\n\n ---Trying to prepare game table for player at" , self.x, self.y)
-        print("Number of players in the game is" , len(g.players))
-    
-    
+    def move(self,grid,players):
+                        
+            self.energy = self.energy - 10
+            grid[self.x][self.y].remove(self)
+            grid[self.x + self.nextOption[0]][self.y + self.nextOption[1]].insert(self)
+            
+            otherPlayers = []
+            foods = []
+            
+            for e in grid[self.x][self.y].entities:
+                if isinstance(e,food):
+                    foods.append(e)
+                elif isinstance(e,player):
+                    otherPlayers.append(e)
+                    
+            if len(otherPlayers) > 1:
+                for p in otherPlayers:
+                    grid[self.x][self.y].remove(p)
+                    players.remove(p)
+                    
+            elif len(foods) > 0:
+                for f in foods:
+                    self.eat(f)
+                    grid[self.x][self.y].remove(f)
+                    
     # Function to evaluate current state of the player, it's neighbours, then take a corresponding action based on these details
     def simulateGame(self,vision):
         # Vision is a 5x5 matrix of all the objects around the player
@@ -133,10 +161,10 @@ class player(entity):
         # The list generates all possible combinations of choices | k contains ONE combination of the choices of all players | l is one choice of each player
         for k in list(it.product(*[range(9)]*playerCount)):
             futureSight = deepcopy( vision )
-            futureSightPlayers = [None]
+            futureSightPlayers = []
                         
             #Assign futureSight players
-            futureSightPlayers[0] = futureSight[2][2].entities[0]
+            futureSightPlayers.append( futureSight[2][2].entities[0] )
             for i in range(5):
                     for j in range(5):
                         if i == 2 and j == 2:
@@ -191,10 +219,20 @@ class player(entity):
                                     pic.payoff = -9999
                             elif len(playersInCell) == 1:
                                 if len(foodInCell) > 0:
-                                    playersInCell[0].payoff = 20
+                                    playersInCell[0].payoff = 100
                                 else:
                                     playersInCell[0].payoff = -10
-                                        
+                                
+                                temp = 0
+                                for w in range(-1,2):
+                                    for h in range(-1,2):
+                                        if i + w > -1 and i + w < 5 and j + h > -1 and j + h < 5:
+                                            if futureSight[i+w][j+h] is not None:
+                                                if len(futureSight[i+w][j+h].entities) > 0:
+                                                   for e in futureSight[i+w][j+h].entities:
+                                                       if isinstance(e,food):
+                                                           temp = temp + 10
+                                playersInCell[0].payoff = playersInCell[0].payoff + temp                               
             # Now this is the tough part. Construct the payoffs :\
             # g[0,0][0] = 8
             #   ^    ^   
@@ -202,6 +240,7 @@ class player(entity):
             #   |
             #   same dimensions as number of players                                                                            
             for p in futureSightPlayers:
+                print(p.payoff)
                 g[k][ futureSightPlayers.index(p)] = p.payoff                    
             
             # Game Table is (Hopefully) filled with all the necessary values     
@@ -212,7 +251,21 @@ class player(entity):
         #Getting to the actual solving part of gambit
         print("Soving the game for " , len(g.players) , " Players")
         solver = gambit.nash.ExternalLogitSolver()
-        print(solver.solve(g))
+        solution = solver.solve(g)
+        print("\n----------------------Game Solved")
+        options = solution[0].__getitem__(g.players[0])
+        agg = 0
+        rand = random.random()
+        self.nextOption = None
+        print(options)
+        i = -1
+        op = []        
+        for o in options:
+            i = i+1
+            agg = agg + o
+            if agg > rand:
+                self.nextOption = self.optionMovement[i]
+                break
         #print(solver.solve(g))
             
 # Class that represents the food in the game world

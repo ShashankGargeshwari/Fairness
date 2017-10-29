@@ -24,9 +24,10 @@ import pygame
 class gamemanager(object):
     
     # Contains parameters used in the generation and simulation of the world 
-    cellToPlayerRatio = 0.05
+    cellToPlayerRatio = 0.01
     foodSpawnChance = 0.1
-    
+    xSize = 1
+    ySize = 1
     # Holds a list of all entities that have to be displayed
     allEntities = '' 
      
@@ -35,6 +36,9 @@ class gamemanager(object):
         self.win = window        
         xSize = xSize / ppu
         ySize = ySize / ppu
+
+        self.xSize = xSize
+        self.ySize = ySize
         # Create the matrix for the grid of cells
         self.grid = np.arange(xSize*ySize , dtype=object).reshape(xSize,ySize)
         
@@ -69,20 +73,7 @@ class gamemanager(object):
                             self.grid[i][j].insert(p)'''
                         
         print("Initialization Done...")
-        for p in self.players:
-            v = np.arange(25  , dtype=object).reshape(5,5)
-            t = ""
-            for i in range(-2,3):
-                for j in range(-2,3):
-                    # Check whether the cell is within the bounds of the grid
-                    if p.x + i > -1 and p.x + i < xSize and  p.y + j > -1 and p.y + j < ySize:
-                        v[i+2][j+2] = self.grid[p.x+i][p.y+j] 
-                                                                           
-                    else:
-                        v[i+2][j+2] = None
-                    
-                    
-            p.simulateGame(v)
+        
                 
       
     # render the game to the graphical window 
@@ -91,8 +82,23 @@ class gamemanager(object):
             for j in range(self.grid.shape[1]):
                 self.grid[i][j].display(self.win)
                 
-                
-        
+       for p in self.players:
+            v = np.arange(25  , dtype=object).reshape(5,5)
+            t = ""
+            for i in range(-2,3):
+                for j in range(-2,3):
+                    # Check whether the cell is within the bounds of the grid
+                    if p.x + i > -1 and p.x + i < self.xSize and  p.y + j > -1 and p.y + j < self.ySize:
+                        v[i+2][j+2] = self.grid[p.x+i][p.y+j] 
+                                                                           
+                    else:
+                        v[i+2][j+2] = None
+                    
+                    
+            p.simulateGame(v)   
+            
+       for p in self.players:
+           p.move(self.grid,self.players)
     
     class environment:
         pass
