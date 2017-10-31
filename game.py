@@ -28,7 +28,7 @@ white = 255, 255, 255
 
 screen = pygame.display.set_mode(size)  # Initialize the screen
 pygame.display.set_caption("A Fair World")  # Define the caption for the window
-clock = pygame.time.Clock()  # Set the game clock
+clock = pygame.time.Clock()  # Set the game cock
 
 gm = gamemanager.gamemanager(screen, size[0], size[1], 32)
 

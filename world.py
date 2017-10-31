@@ -119,7 +119,7 @@ class player(entity):
         if len(otherPlayers) > 1:
             for p in otherPlayers:
                 grid[self.x][self.y].remove(p)
-                players = np.delete(players, p)
+                players = np.delete(players,p)
 
         elif len(foods) > 0:
             for f in foods:
@@ -218,9 +218,9 @@ class player(entity):
                     if futureSight[newX][newY] is not None:
                         futureSight[newX][newY].insert(currentPlayer)
                     else:
-                        currentPlayer.payoff = -999999
+                        currentPlayer.payoff = -999
                 else:
-                    currentPlayer.payoff = -200
+                    currentPlayer.payoff = -20
 
             # All movement made, evaluate the payoffs for each player and store it
 
@@ -239,11 +239,11 @@ class player(entity):
 
                             if len(playersInCell) > 1:
                                 for pic in playersInCell:
-                                    pic.payoff = -9999
+                                    pic.payoff = -99
                             elif len(playersInCell) == 1:
                                 playersInCell[0].payoff = 0
                                 if len(foodInCell) > 0:
-                                    playersInCell[0].payoff = 100
+                                    playersInCell[0].payoff = 10
                                 if len(futureSight[i][j].ping(scent)) > 0:
                                     for s in futureSight[i][j].ping(scent):
                                         playersInCell[0].payoff = playersInCell[0].payoff - s.strength / 100
@@ -256,7 +256,7 @@ class player(entity):
                                                 if len(futureSight[i + w][j + h].entities) > 0:
                                                     for e in futureSight[i + w][j + h].entities:
                                                         if isinstance(e, food):
-                                                            temp = temp + 10
+                                                            temp = temp + 1
                                 playersInCell[0].payoff = playersInCell[0].payoff + temp
                                 # Now this is the tough part. Construct the payoffs :\
             # g[0,0][0] = 8
