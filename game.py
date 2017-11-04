@@ -38,20 +38,21 @@ gamemanager.cell.setSprite(pygame.image.load(r"Sprites/grass.png"))
 gamemanager.food.setSprite(pygame.image.load(r"Sprites/food.png"))
 gamemanager.player.setSprite(pygame.image.load(r"Sprites/player.png"))
 gamemanager.scent.setSprite(pygame.image.load(r"Sprites/scent.png"))
-x = size[0] * 0.5
-y = size[1] * 0.5
 
+# Game loop stop variable
 stop = False
 
+# Main game loop
 while not stop:
 
+    # Stop game when player closes the game window
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             stop = True
 
     screen.fill(white)  # clear the screen (with white)
 
-    gm.display()  # render the game
+    gm.display()  # render the game using the game manager
 
     pygame.display.update()
     clock.tick(60)
